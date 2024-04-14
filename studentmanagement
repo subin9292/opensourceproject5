@@ -1,0 +1,175 @@
+studentnum = []
+name = []
+eng_score = []
+c_score = []
+python_score = []
+average_score = []
+total_score = []
+grade = []
+rank_list = []
+
+# 학점 계산 함수
+def calculate_grade(score):
+    if score >= 90:
+        return 'A'
+    elif 80 <= score < 90:
+        return 'B'
+    elif 70 <= score < 80:
+        return 'C'
+    elif 60 <= score < 70:
+        return 'D'
+    else:
+        return 'F'
+
+# 입력 함수
+def inputs():
+    for _ in range(5):
+        studentnum.append(input("학번: "))
+        name.append(input("이름: "))
+        eng_score.append(int(input("영어 점수: ")))
+        c_score.append(int(input("C-언어 점수: ")))
+        python_score.append(int(input("파이썬 점수: ")))
+
+# 총점/평균 계산 함수
+def total_average():
+    total_score.clear()
+    average_score.clear()
+    for i in range(len(studentnum)):
+        total = c_score[i] + eng_score[i] + python_score[i]
+        total_score.append(total)
+        average_score.append(total / 3)
+
+# 등수 계산 함수
+def find_rank():
+    rank_list.clear()
+    for i in range(len(average_score)):
+        rank = 1
+        for j in range(len(average_score)):
+            if average_score[i] < average_score[j]:
+                rank += 1
+        rank_list.append(rank)
+
+# 출력 함수
+def print_results():
+  print(
+    "\n=============================================================================\n"
+  )
+  print("학번 \t\t   이름 \t\t영어    C-언어   파이썬   총점   평균  학점  등수")
+  print(
+    "\n=============================================================================\n"
+  )
+
+  for i in range(0, 5, 1):
+      print(studentnum[i], "\t  ", name[i], "\t", eng_score[i], "     ", c_score[i],
+        "     ", python_score[i], "    ", "%.0f" % total_score[i], "  ",
+        "%.0f" % average_score[i], "   ", grade[i], "   ", rank_list[i])
+
+
+
+# 삽입 함수
+def insert_student():
+    if len(name) >= 5:
+        print("이미 5명의 학생이 입력되어 있습니다.")
+    else:
+        studentnum.append(input("학번: "))
+        name.append(input("이름: "))
+        eng_score.append(int(input("영어 점수: ")))
+        c_score.append(int(input("C-언어 점수: ")))
+        python_score.append(int(input("파이썬 점수: ")))
+        total_average()
+        update_grades_ranks()
+
+# 삭제 함수
+def delete_student():
+    rm_name = input("삭제할 학생의 이름을 입력하세요: ")
+    if rm_name in name:
+        index = name.index(rm_name)
+        del studentnum[index]
+        del name[index]
+        del eng_score[index]
+        del c_score[index]
+        del python_score[index]
+        total_average()
+        update_grades_ranks()
+    else:
+        print("학생을 찾을 수 없습니다.")
+
+# 탐색 함수
+def search_student():
+    option = input("학번으로 검색할까요, 이름으로 검색할까요? (학번/이름): ")
+    if option == "학번":
+        num = input("학번을 입력하세요: ")
+        if num in studentnum:
+            index = studentnum.index(num)
+            print_student_info(index)
+        else:
+            print("해당 학번의 학생이 없습니다.")
+    elif option == "이름":
+        nm = input("이름을 입력하세요: ")
+        if nm in name:
+            index = name.index(nm)
+            print_student_info(index)
+        else:
+            print("해당 이름의 학생이 없습니다.")
+
+# 학생 정보 출력
+def print_student_info(index):
+    print("\n학번\t이름\t영어\tC-언어\t파이썬\t총점\t평균\t학점\t등수")
+    print(f"{studentnum[index]}\t{name[index]}\t{eng_score[index]}\t{c_score[index]}\t{python_score[index]}\t{total_score[index]}\t{average_score[index]:.2f}\t{grade[index]}\t{rank_list[index]}")
+
+# 정렬 함수
+def sort_students():
+    # 총점을 기준으로 내림차순 정렬
+    zipped_lists = zip(total_score, studentnum, name, eng_score, c_score, python_score, average_score, grade, rank_list)
+    sorted_students = sorted(zipped_lists, reverse=True)
+    unzip = list(zip(*sorted_students))
+    total_score[:], studentnum[:], name[:], eng_score[:], c_score[:], python_score[:], average_score[:], grade[:], rank_list[:] = unzip
+    print_results()
+
+# 80점 이상 학생 수 계산
+def count_high_scores():
+    count = sum(1 for score in average_score if score >= 80)
+    print(f"평균 점수가 80점 이상인 학생은 {count}명입니다.")
+
+# 학점과 등수 업데이트
+def update_grades_ranks():
+    grade.clear()
+    for score in average_score:
+        grade.append(calculate_grade(score))
+    find_rank()
+
+# 메인 함수
+def main_menu():
+    while True:
+        print("\n============= 메뉴 ================\n")
+        print("1. 초기값 입력")
+        print("2. 삽입")
+        print("3. 탐색")
+        print("4. 삭제")
+        print("5. 출력")
+        print("6. 정렬")
+        print("7. 80점 이상 학생 수")
+        print("-1. 종료")
+        choice = int(input("옵션을 선택하세요: "))
+
+        if choice == -1:
+            break
+        elif choice == 1:
+            inputs()
+            total_average()
+            update_grades_ranks()
+        elif choice == 2:
+            insert_student()
+        elif choice == 3:
+            search_student()
+        elif choice == 4:
+            delete_student()
+        elif choice == 5:
+            print_results()
+        elif choice == 6:
+            sort_students()
+        elif choice == 7:
+            count_high_scores()
+
+if __name__ == "__main__":
+    main_menu()
