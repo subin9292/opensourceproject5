@@ -1,0 +1,61 @@
+import random
+
+def initialize_board():
+    return [[str(i + 1) for i in range(j * 3, (j + 1) * 3)] for j in range(3)]
+
+def print_board(board):
+    print("\n현재 게임판:")
+    print("-------------")
+    for i in range(3):
+        print("| " + " | ".join(board[i]) + " |")
+        print("-------------")
+
+def convert_position(position):
+    row = (position - 1) // 3
+    col = (position - 1) % 3
+    return row, col
+
+def is_valid_move(board, position):
+    row, col = convert_position(position)
+    return board[row][col] not in ['X', 'O']
+
+def check_bingo(board):
+    lines = board + [list(x) for x in zip(*board)]  # 가로 및 세로 줄 확인
+    lines.append([board[i][i] for i in range(3)])  # 주 대각선 확인
+    lines.append([board[2-i][i] for i in range(3)])  # 부 대각선 확인
+    return any(line == ['X', 'X', 'X'] or line == ['O', 'O', 'O'] for line in lines)
+
+def make_move(board, token):
+    if token == 'O':  # 컴퓨터의 차례
+        while True:
+            position = random.randint(1, 9)
+            if is_valid_move(board, position):
+                break
+    else:  # 사용자의 차례
+        while True:
+            print_board(board)  # 사용자가 입력하기 직전에 보드판 보여주기
+            position = int(input("원하는 위치(1-9)에 X를 놓으세요: "))
+            if 1 <= position <= 9 and is_valid_move(board, position):
+                break
+            print("유효하지 않은 위치입니다. 다시 시도해주세요.")
+    row, col = convert_position(position)
+    board[row][col] = token
+
+def main():
+    board = initialize_board()  # 보드 초기화
+    current_token = 'X'  # 사용자가 먼저 시작
+
+    while True:
+        if check_bingo(board):
+            print_board(board)
+            print(f"{current_token} (이)가 승리했습니다!" if current_token == 'X' else f"컴퓨터가 승리했습니다!")
+            break
+        if all(cell in ['X', 'O'] for row in board for cell in row):
+            print_board(board)
+            print("게임은 무승부로 끝났습니다!")
+            break
+        make_move(board, current_token)
+        current_token = 'O' if current_token == 'X' else 'X'
+
+if __name__ == "__main__":
+    main()
